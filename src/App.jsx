@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, Navigate } from "react-router-dom";
 
 import authService from "./appwrite/auth";
 import { login, logout } from "./store/authSlice";
@@ -46,32 +46,41 @@ function App() {
       <main className="flex-grow">
         <Routes>
           <Route path="/" element={<Home />} />
+          
           <Route path="/login" element={
             <AuthLayout authentication={false}>
               <Login />
             </AuthLayout>
           } />
+          
           <Route path="/signup" element={
             <AuthLayout authentication={false}>
               <Signup />
             </AuthLayout>
           } />
+
           <Route path="/all-posts" element={
             <AuthLayout>
               <AllPosts />
             </AuthLayout>
           } />
+
           <Route path="/add-post" element={
             <AuthLayout>
               <AddPost />
             </AuthLayout>
           } />
+
           <Route path="/edit-post/:slug" element={
             <AuthLayout>
               <EditPost />
             </AuthLayout>
           } />
+
           <Route path="/post/:slug" element={<Post />} />
+
+          {/* Fallback route for unknown paths */}
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
 
