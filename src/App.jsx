@@ -1,25 +1,10 @@
 import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { Route, Routes, Navigate } from "react-router-dom";
-
+import { Outlet } from "react-router-dom";
 import authService from "./appwrite/auth";
 import { login, logout } from "./store/authSlice";
 
-import {
-  Header,
-  Footer,
-  AuthLayout,
-} from "./components";
-
-import {
-  Home,
-  Login,
-  Signup,
-  Post,
-  AddPost,
-  AllPosts,
-  EditPost,
-} from "./pages";
+import { Header, Footer } from "./components";
 
 function App() {
   const dispatch = useDispatch();
@@ -33,56 +18,29 @@ function App() {
           dispatch(logout());
         }
       })
-      .catch((error) => {
-        console.error("App.jsx :: getCurrentUser error:", error);
-        dispatch(logout());
-      });
-  }, [dispatch]);
+      .catch(() => dispatch(logout()));
+  }, []);
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
+    <div className="min-h-screen bg-white text-black">
+      <div
+        className="max-w-[1300px] mx-auto grid 
+        grid-cols-[250px_1fr_350px] gap-5 pt-3
+        max-[1100px]:grid-cols-[80px_1fr] max-[1100px]:px-2"
+      >
+        {/* LEFT SIDEBAR */}
+        <div className="sticky top-0 h-screen">
+          <Header />
+        </div>
 
-      <main className="flex-grow">
-        <Routes>
-          <Route path="/" element={<Home />} />
-          
-          <Route path="/login" element={
-            <AuthLayout authentication={false}>
-              <Login />
-            </AuthLayout>
-          } />
-          
-          <Route path="/signup" element={
-            <AuthLayout authentication={false}>
-              <Signup />
-            </AuthLayout>
-          } />
+        {/* CENTER FEED */}
+        <main className="border-x border-gray-200">
+          <Outlet /> {/* ⬅️ Handles all child routes */}
+        </main>
 
-          <Route path="/all-posts" element={
-            <AuthLayout>
-              <AllPosts />
-            </AuthLayout>
-          } />
-
-          <Route path="/add-post" element={
-            <AuthLayout>
-              <AddPost />
-            </AuthLayout>
-          } />
-
-          <Route path="/edit-post/:slug" element={
-            <AuthLayout>
-              <EditPost />
-            </AuthLayout>
-          } />
-
-          <Route path="/post/:slug" element={<Post />} />
-
-          {/* Fallback route for unknown paths */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </main>
+        {/* RIGHT SIDEBAR */}
+        <aside className="hidden max-[1100px]:hidden md:block"></aside>
+      </div>
 
       <Footer />
     </div>

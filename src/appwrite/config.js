@@ -1,10 +1,12 @@
+// services/appwrite.js OR conf/service.js (your path)
 import conf from "../conf/conf";
-import { Client, ID, Databases, Storage, Query } from "appwrite";
+import { Client, ID, Databases, Storage, Query, Account } from "appwrite";
 
 export class Service {
     client = new Client();
     databases;
     bucket;
+    account;
 
     constructor() {
         this.client
@@ -13,9 +15,37 @@ export class Service {
 
         this.databases = new Databases(this.client);
         this.bucket = new Storage(this.client);
+        this.account = new Account(this.client); // ADDED
     }
 
-    // Create a new blog post
+    // 🔥 Get the logged-in user
+    async getUser() {
+        try {
+            return await this.account.get();
+        } catch (error) {
+            console.error("Appwrite service :: getUser :: error", error);
+            return null;
+        }
+    }
+
+    // 🔥 Get total posts by specific user
+    async getUserPosts(userId) {
+        try {
+            return await this.databases.listDocuments(
+                conf.appwriteDatabaseId,
+                conf.appwriteCollectionId,
+                [
+                    Query.equal("userId", userId),
+                    Query.equal("status", "active"),
+                ]
+            );
+        } catch (error) {
+            console.error("Appwrite :: getUserPosts :: error", error);
+            return [];
+        }
+    }
+
+    // 🔥 Create post
     async createPost({ title, slug, content, feauturedImage, status, userId }) {
         try {
             return await this.databases.createDocument(
@@ -37,7 +67,7 @@ export class Service {
         }
     }
 
-    // Update an existing blog post
+    // 🔥 Update post
     async updatePost(slug, { title, content, feauturedImage, status }) {
         try {
             return await this.databases.updateDocument(
@@ -57,7 +87,7 @@ export class Service {
         }
     }
 
-    // Delete a blog post
+    // 🔥 Delete post
     async deletePost(slug) {
         try {
             await this.databases.deleteDocument(
@@ -72,7 +102,7 @@ export class Service {
         }
     }
 
-    // Get a single blog post
+    // 🔥 Get single post
     async getPost(slug) {
         try {
             return await this.databases.getDocument(
@@ -86,7 +116,7 @@ export class Service {
         }
     }
 
-    // Get all posts with status = "active"
+    // 🔥 Get all active posts
     async getPosts(queries = [Query.equal("status", "active")]) {
         try {
             return await this.databases.listDocuments(
@@ -100,7 +130,7 @@ export class Service {
         }
     }
 
-    // Upload a file to storage
+    // 🔥 Upload file
     async uploadFile(file) {
         try {
             return await this.bucket.createFile(
@@ -114,7 +144,7 @@ export class Service {
         }
     }
 
-    // Delete a file from storage
+    // 🔥 Delete file
     async deleteFile(fileId) {
         try {
             await this.bucket.deleteFile(conf.appwriteBucketId, fileId);
@@ -125,12 +155,12 @@ export class Service {
         }
     }
 
-    // Get file preview URL - changed to use download instead (Free plan limitation)
+    // 🔥 Preview (only download link works on free plan)
     getFilePreview(fileId) {
         return this.bucket.getFileDownload(conf.appwriteBucketId, fileId);
     }
 
-    // Get file download URL
+    // 🔥 Download file
     getFileDownload(fileId) {
         return this.bucket.getFileDownload(conf.appwriteBucketId, fileId);
     }

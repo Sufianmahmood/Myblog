@@ -7,32 +7,37 @@ function AllPosts() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    appwriteService.getPosts().then((postsResult) => {
-      if (postsResult && postsResult.documents) {
-        setPosts(postsResult.documents);
-      }
-      setLoading(false);
-    }).catch((err) => {
-      console.error("AllPosts.jsx :: error loading posts", err);
-      setLoading(false);
-    });
+    appwriteService
+      .getPosts()
+      .then((postsResult) => {
+        if (postsResult && postsResult.documents) {
+          setPosts(postsResult.documents);
+        }
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("AllPosts.jsx :: error loading posts", err);
+        setLoading(false);
+      });
   }, []);
 
   return (
-    <div className="w-full py-8">
+    <div className="w-full py-6 flex justify-center">
       <Container>
-        <div className="flex flex-wrap -mx-2">
+        <div className="max-w-xl mx-auto">
+
           {loading ? (
-            <p className="text-center w-full">Loading posts...</p>
+            <p className="text-center">Loading posts...</p>
           ) : posts.length === 0 ? (
-            <p className="text-center w-full">No posts available</p>
+            <p className="text-center">No posts available</p>
           ) : (
             posts.map((post) => (
-              <div key={post.$id} className="p-2 w-full sm:w-1/2 md:w-1/3 lg:w-1/4">
+              <div key={post.$id} className="mb-4">
                 <PostCard {...post} />
               </div>
             ))
           )}
+
         </div>
       </Container>
     </div>

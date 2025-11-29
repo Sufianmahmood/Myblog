@@ -1,37 +1,50 @@
-import React from 'react';
+import React from "react";
+import { Link } from "react-router-dom";
 import appwriteService from "../appwrite/config";
-import { Link } from 'react-router-dom';
 
 function PostCard({ $id, title, feauturedImage }) {
+
   const imageUrl = feauturedImage
     ? appwriteService.getFilePreview(feauturedImage)?.href
     : null;
 
-  // 🧪 Debug logs
-  console.log("🧪 PostCard image ID:", feauturedImage);
-  console.log("🧪 Image URL:", imageUrl);
-
   return (
     <Link to={`/post/${$id}`}>
-      <div className="w-full bg-white rounded-xl p-4 shadow hover:shadow-md transition">
-        <div className="w-full h-48 mb-4 overflow-hidden rounded-lg">
-          {imageUrl ? (
-            <img
-              src={imageUrl}
-              alt={title}
-              className="w-full h-full object-cover"
-              onError={(e) => {
-                e.target.src = "/no-image.png"; // Fallback image
-                e.target.onerror = null;
-              }}
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center bg-gray-200 text-gray-600">
-              No Image Available
-            </div>
-          )}
+      <div className="w-full border-b border-gray-200 p-4 cursor-pointer hover:bg-gray-50 transition">
+
+        {/* Avatar + Content */}
+        <div className="flex gap-4">
+
+          {/* Avatar Circle */}
+          <div>
+            <div className="w-12 h-12 bg-gray-300 rounded-full"></div>
+          </div>
+
+          {/* Post Content */}
+          <div className="flex-1">
+
+            {/* Title (Tweet text) */}
+            <h2 className="text-[17px] font-medium text-gray-800 mb-2">
+              {title}
+            </h2>
+
+            {/* Featured Image */}
+            {imageUrl && (
+              <div className="mt-2 rounded-xl overflow-hidden border border-gray-200">
+                <img
+                  src={imageUrl}
+                  alt={title}
+                  className="w-full h-auto object-cover"
+                  onError={(e) => {
+                    e.target.src = "/no-image.png";
+                  }}
+                />
+              </div>
+            )}
+
+
+          </div>
         </div>
-        <h2 className="text-lg font-semibold text-gray-800">{title}</h2>
       </div>
     </Link>
   );

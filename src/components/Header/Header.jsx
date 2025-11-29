@@ -1,9 +1,18 @@
-import React from 'react';
-import { Container, Logo, LogoutBtn } from '../index';
-import { Link, useNavigate } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
-import authService from "../../appwrite/auth"; // ✅ correct relative path
-import { logout } from '../../store/authSlice';
+import React from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import authService from "../../appwrite/auth";
+import { logout } from "../../store/authSlice";
+
+import { 
+  FaHome, 
+  FaPlusCircle, 
+  FaListUl, 
+  FaSignOutAlt, 
+  FaSignInAlt, 
+  FaUserPlus,
+  FaUserCircle       // ✅ Profile Icon
+} from "react-icons/fa";
 
 function Header() {
   const authStatus = useSelector((state) => state.auth.status);
@@ -14,51 +23,71 @@ function Header() {
     try {
       await authService.logout();
       dispatch(logout());
-      navigate('/login');
+      navigate("/login");
     } catch (error) {
-      console.error('Logout error:', error);
+      console.error("Logout error:", error);
     }
   };
 
-  const navItems = [
-    { name: 'Home', slug: '/', active: true },
-    { name: 'Login', slug: '/login', active: !authStatus },
-    { name: 'SignUp', slug: '/signup', active: !authStatus },
-    { name: 'All Posts', slug: '/all-posts', active: authStatus },
-    { name: 'Add Post', slug: '/add-post', active: authStatus },
+  const menu = [
+    { name: "Home", slug: "/", icon: <FaHome />, show: true },
+    { name: "Login", slug: "/login", icon: <FaSignInAlt />, show: !authStatus },
+    { name: "Sign Up", slug: "/signup", icon: <FaUserPlus />, show: !authStatus },
+    { name: "All Posts", slug: "/all-posts", icon: <FaListUl />, show: authStatus },
+    { name: "Add Post", slug: "/add-post", icon: <FaPlusCircle />, show: authStatus },
+    
+    // ✅ NEW: Profile Button (only for logged in users)
+    { name: "Profile", slug: "/profile", icon: <FaUserCircle />, show: authStatus },
   ];
 
   return (
-    <header className="py-3 shadow bg-gray-500">
-      <Container>
-        <nav className="flex">
-          <div className="mr-4">
-  <Logo width="70px" />
+    <aside className="h-screen sticky top-0 flex flex-col p-4">
 
-          </div>
-          <ul className="flex ml-auto">
-            {navItems.map(
-              (item) =>
-                item.active && (
-                  <li key={item.name}>
-                    <button
-                      onClick={() => navigate(item.slug)}
-                      className="inline-block px-6 py-2 duration-200 hover:bg-blue-100 rounded-full"
-                    >
-                      {item.name}
-                    </button>
-                  </li>
-                )
-            )}
-            {authStatus && (
-              <li>
-                <LogoutBtn onClick={handleLogout} />
-              </li>
-            )}
-          </ul>
-        </nav>
-      </Container>
-    </header>
+      {/* LOGO */}
+      <h1 
+        onClick={() => navigate("/")}
+        className="text-3xl font-bold text-blue-500 cursor-pointer mb-7 px-3"
+      >
+        MyBlog
+      </h1>
+
+      {/* MENU ITEMS */}
+      <div className="space-y-3">
+        {menu
+          .filter((item) => item.show)
+          .map((item) => (
+            <button
+              key={item.name}
+              onClick={() => navigate(item.slug)}
+              className="
+                flex items-center gap-4 text-xl 
+                px-5 py-3 rounded-full cursor-pointer 
+                hover:bg-blue-100 hover:text-blue-500 
+                transition-all w-full
+              "
+            >
+              {item.icon}
+              <span className="max-[1100px]:hidden">{item.name}</span>
+            </button>
+          ))}
+
+        {/* LOGOUT BUTTON */}
+        {authStatus && (
+          <button
+            onClick={handleLogout}
+            className="
+              flex items-center gap-4 text-xl 
+              px-5 py-3 rounded-full cursor-pointer 
+              hover:bg-red-100 hover:text-red-500 
+              transition-all w-full
+            "
+          >
+            <FaSignOutAlt />
+            <span className="max-[1100px]:hidden">Logout</span>
+          </button>
+        )}
+      </div>
+    </aside>
   );
 }
 
